@@ -4,6 +4,7 @@ namespace Haringsrob\FilamentPageBuilder\Models\Contracts;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-interface Blockable {
+interface Blockable
+{
     public function blocks(): MorphMany;
 }

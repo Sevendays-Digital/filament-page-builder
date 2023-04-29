@@ -41,7 +41,8 @@ class BlockEditor extends Builder
 
     private array $coreFields = ['id', 'type', 'position'];
 
-    public function configure(): static {
+    public function configure(): static
+    {
         parent::configure();
         $this->relationship('blocks');
 
@@ -351,9 +352,8 @@ class BlockEditor extends Builder
                 $view,
                 ['preview' => $container->getParentComponent()->renderDisplay($container->getState())]
             );
-        }
-        catch (ErrorException|Exception $e) {
-            return __('Error when rendering: :phError', ['phError'=> $e->getMessage()]);
+        } catch (ErrorException|Exception $e) {
+            return __('Error when rendering: :phError', ['phError' => $e->getMessage()]);
         }
     }
 }

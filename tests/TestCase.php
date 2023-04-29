@@ -3,10 +3,10 @@
 namespace Haringsrob\FilamentPageBuilder\Tests;
 
 use Filament\FilamentServiceProvider;
+use Haringsrob\FilamentPageBuilder\FilamentPageBuilderServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Haringsrob\FilamentPageBuilder\FilamentPageBuilderServiceProvider;
 
 class TestCase extends Orchestra
 {

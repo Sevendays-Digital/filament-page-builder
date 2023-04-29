@@ -22,7 +22,7 @@ class MakePageBuilderBlock extends GeneratorCommand
      */
     protected $description = 'Make page builder block';
 
-/**
+    /**
      * The type of class being generated.
      *
      * @var string
@@ -53,7 +53,7 @@ class MakePageBuilderBlock extends GeneratorCommand
 
         $name = str_replace('/', '\\', $name);
 
-        $rootNamespace = $this->rootNamespace() . '\\Filament\\Blocks';
+        $rootNamespace = $this->rootNamespace().'\\Filament\\Blocks';
 
         if (Str::startsWith($name, $rootNamespace)) {
             return Str::replace('\\\\', '\\', $name);

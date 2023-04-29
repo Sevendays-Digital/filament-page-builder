@@ -4,7 +4,6 @@ namespace Haringsrob\FilamentPageBuilder;
 
 use Filament\PluginServiceProvider;
 use Haringsrob\FilamentPageBuilder\Commands\MakePageBuilderBlock;
-use Haringsrob\FilamentPageBuilder\BlockRenderer;
 use Illuminate\Filesystem\Filesystem;
 use Spatie\LaravelPackageTools\Package;
 
@@ -29,10 +28,11 @@ class FilamentPageBuilderServiceProvider extends PluginServiceProvider
             ->hasCommand(MakePageBuilderBlock::class);
     }
 
-    public function register(): void {
+    public function register(): void
+    {
         parent::register();
 
-        $this->app->bind('filament-block-renderer', function($app) {
+        $this->app->bind('filament-block-renderer', function ($app) {
             return new BlockRenderer($app->get(Filesystem::class));
         });
     }

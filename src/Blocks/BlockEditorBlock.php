@@ -9,7 +9,8 @@ use Illuminate\Support\Str;
 
 abstract class BlockEditorBlock extends Block
 {
-    static function getSystemName(): string {
+    public static function getSystemName(): string
+    {
         return Str::afterLast(static::class, '\\');
     }
 

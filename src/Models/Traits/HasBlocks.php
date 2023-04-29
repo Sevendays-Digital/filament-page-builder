@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 /**
  * @extends \Illuminate\Database\Eloquent\Model;
  */
-trait HasBlocks {
+trait HasBlocks
+{
     public function blocks(): MorphMany
     {
         return $this->morphMany(Block::class, 'blockable');
