@@ -4,6 +4,8 @@ namespace Haringsrob\FilamentPageBuilder;
 
 use Filament\PluginServiceProvider;
 use Haringsrob\FilamentPageBuilder\Commands\MakePageBuilderBlock;
+use Haringsrob\FilamentPageBuilder\BlockRenderer;
+use Illuminate\Filesystem\Filesystem;
 use Spatie\LaravelPackageTools\Package;
 
 class FilamentPageBuilderServiceProvider extends PluginServiceProvider
@@ -25,5 +27,13 @@ class FilamentPageBuilderServiceProvider extends PluginServiceProvider
             ->runsMigrations()
             ->hasMigration('2023_02_07_153528_create_blocks_table')
             ->hasCommand(MakePageBuilderBlock::class);
+    }
+
+    public function register(): void {
+        parent::register();
+
+        $this->app->bind('filament-block-renderer', function($app) {
+            return new BlockRenderer($app->get(Filesystem::class));
+        });
     }
 }

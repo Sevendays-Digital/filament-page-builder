@@ -23,7 +23,7 @@ class BlockEditor extends Builder
 
     protected bool|Closure $isCollapsed = false;
 
-    protected string|Closure|null $relationship = 'blocks';
+    protected string|Closure|null $relationship = null;
 
     protected ?Closure $modifyRelationshipQueryUsing = null;
 
@@ -40,6 +40,13 @@ class BlockEditor extends Builder
     protected null|Closure|string $renderInView = 'filament-page-builder::preview';
 
     private array $coreFields = ['id', 'type', 'position'];
+
+    public function configure(): static {
+        parent::configure();
+        $this->relationship('blocks');
+
+        return $this;
+    }
 
     public function blocks(Closure|array $blocks): static
     {

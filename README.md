@@ -11,6 +11,9 @@ With this package you have a new Filament field (like Builder) but with a visual
 Please not that this is a pre-production package, there are many things potentially still bugged and it may not work 
 together with some other packages (like translations).
 
+Methods and flow may still change before a first release, so if you use it, keep in mind that a composer update may
+break it.
+
 If you encounter issues, please provide a pull request.
 
 ## Installation
@@ -117,7 +120,15 @@ If all goes well, you should now have the block builder on your page. Do not for
 
 ### 4. Rendering on the front-end
 
-Helpers for this are not yet created..
+There are not many tools for this yet but basic rendering works like this:
+
+```php
+@foreach($page->blocks as $block)
+    {!! \Haringsrob\FilamentPageBuilder\Facades\BlockRenderer::renderBlock($block) !!}
+@endforeach
+```
+
+`$page` is your model that has blocks.
 
 ## Testing
 
