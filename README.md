@@ -105,7 +105,7 @@ public static function form(Form $form): Form
     return $form
         ->schema([
             BlockEditor::make('blocks')
-                ->blocks([
+                ->blocks([ // You can add more blocks here.
                     DemoBlock::class,
                 ])
                 ->renderInView('blocks.preview'), // Optional: To render the preview in a different view.
@@ -114,6 +114,10 @@ public static function form(Form $form): Form
 ```
 
 If all goes well, you should now have the block builder on your page. Do not forget to run migrations.
+
+### 4. Rendering on the front-end
+
+Helpers for this are not yet created..
 
 ## Testing
 

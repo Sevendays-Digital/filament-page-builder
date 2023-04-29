@@ -21,7 +21,7 @@ class BlockEditor extends Builder
 
     protected bool|Closure|null $isCollapsible = true;
 
-    protected bool|Closure $isCollapsed = true;
+    protected bool|Closure $isCollapsed = false;
 
     protected string|Closure|null $relationship = 'blocks';
 
