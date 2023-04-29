@@ -3,23 +3,12 @@
 namespace Haringsrob\FilamentPageBuilder;
 
 use Filament\PluginServiceProvider;
+use Haringsrob\FilamentPageBuilder\Commands\MakePageBuilderBlock;
 use Spatie\LaravelPackageTools\Package;
 
 class FilamentPageBuilderServiceProvider extends PluginServiceProvider
 {
     public static string $name = 'filament-page-builder';
-
-    protected array $resources = [
-        // CustomResource::class,
-    ];
-
-    protected array $pages = [
-        // CustomPage::class,
-    ];
-
-    protected array $widgets = [
-        // CustomWidget::class,
-    ];
 
     protected array $styles = [
         'plugin-filament-page-builder' => __DIR__.'/../resources/dist/filament-page-builder.css',
@@ -29,12 +18,10 @@ class FilamentPageBuilderServiceProvider extends PluginServiceProvider
         'plugin-filament-page-builder' => __DIR__.'/../resources/dist/filament-page-builder.js',
     ];
 
-    // protected array $beforeCoreScripts = [
-    //     'plugin-filament-page-builder' => __DIR__ . '/../resources/dist/filament-page-builder.js',
-    // ];
-
     public function configurePackage(Package $package): void
     {
-        $package->name(static::$name);
+        $package->name(static::$name)
+            ->hasViews('filament-page-builder')
+            ->hasCommand(MakePageBuilderBlock::class);
     }
 }

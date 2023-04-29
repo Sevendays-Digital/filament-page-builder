@@ -6,8 +6,12 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/haringsrob/filament-page-builder.svg?style=flat-square)](https://packagist.org/packages/haringsrob/filament-page-builder)
 
 
+With this package you have a new Filament field (like Builder) but with a visual ui and dynamic types.
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+Please not that this is a pre-production package, there are many things potentially still bugged and it may not work 
+together with some other packages (like translations).
+
+If you encounter issues, please provide a pull request.
 
 ## Installation
 
@@ -24,7 +28,7 @@ php artisan vendor:publish --tag="filament-page-builder-migrations"
 php artisan migrate
 ```
 
-You can publish the config file with:
+You can publish the config file with (currently no config):
 
 ```bash
 php artisan vendor:publish --tag="filament-page-builder-config"
@@ -45,12 +49,75 @@ return [
 
 ## Usage
 
-```php
-$filament-page-builder = new Haringsrob\FilamentPageBuilder();
-echo $filament-page-builder->echoPhrase('Hello, Haringsrob!');
+Filament page builder is a custom Filament field that adds functionality on top of the Builder field.
+
+To use this, create a Model and Resource as per the Filament documentation then do the following:
+
+### 1. Generate a block
+
+You can use the command below to generate a block:
+
+```shell
+php artisan make:page-builder-block DemoBlock
 ```
 
+This will create 2 files:
+
+`app/Filament/Blocks/DemoBlock.php`: This is where you define the form fields and render view.
+`resources/views/filament/blocks/demo-block.blade.php`: This is how your block is supposed to be rendered.
+
+The default generator provides just a 'title' field.
+
+### 2. Add the contract and trait to your model
+
+In order to save blocks, you need to add the Blockable interface and HasBlocks trait to your model.
+
+```php
+<?php
+
+namespace App\Models;
+
+use Haringsrob\FilamentPageBuilder\Models\Contracts\Blockable;
+use Haringsrob\FilamentPageBuilder\Models\Traits\HasBlocks;
+use Illuminate\Database\Eloquent\Model;
+
+class Page extends Model implements Blockable
+{
+    use HasBlocks;
+
+    protected $fillable = [
+        'title'
+    ];
+}
+```
+
+### 3. Add the field to your resource form
+
+In your resource form we can now add the field:
+
+```php
+<?php
+use Haringsrob\FilamentPageBuilder\Forms\Components\BlockEditor;
+use App\Filament\Blocks\DemoBlock;
+
+public static function form(Form $form): Form
+{
+    return $form
+        ->schema([
+            BlockEditor::make('blocks')
+                ->blocks([
+                    DemoBlock::class,
+                ])
+                ->renderInView('blocks.preview'), // Optional: To render the preview in a different view.
+        ]);
+}
+```
+
+If all goes well, you should now have the block builder on your page. Do not forget to run migrations.
+
 ## Testing
+
+Not done yet.
 
 ```bash
 composer test
