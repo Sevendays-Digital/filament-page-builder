@@ -16,6 +16,10 @@ break it.
 
 If you encounter issues, please provide a pull request.
 
+To see a demo:
+
+[![Simple demo](https://img.youtube.com/vi/k3T9bAkm4LI/0.jpg)](https://www.youtube.com/watch?v=k3T9bAkm4LI)
+
 ## Installation
 
 You can install the package via composer:
