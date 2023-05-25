@@ -8,10 +8,12 @@ use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Contracts\HasForms;
 use Haringsrob\FilamentPageBuilder\Blocks\BlockEditorBlock;
+use Haringsrob\FilamentPageBuilder\Models\Block;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use PHPUnit\Exception;
 
@@ -52,7 +54,7 @@ class BlockEditor extends Builder
     public function blocks(Closure|array $blocks): static
     {
         if ($blocks instanceof \Closure) {
-            throw new Exception('Not supported yet.');
+            throw new \Exception('Not supported yet.');
         }
 
         $list = [];
@@ -76,9 +78,9 @@ class BlockEditor extends Builder
         $records = $relationship ? $this->getCachedExistingRecords() : null;
 
         return collect($this->getState())
-            ->filter(fn (array $itemData): bool => $this->hasBlock($itemData['type']))
+            ->filter(fn(array $itemData): bool => $this->hasBlock($itemData['type']))
             ->map(
-                fn (array $itemData, $itemIndex): ComponentContainer => $this
+                fn(array $itemData, $itemIndex): ComponentContainer => $this
                     ->getBlock($itemData['type'])
                     ->getChildComponentContainer()
                     ->model($relationship ? $records[$itemIndex] ?? $this->getRelatedModel() : null)
@@ -124,7 +126,7 @@ class BlockEditor extends Builder
             $relationship
                 ->whereIn($relationship->getRelated()->getQualifiedKeyName(), $recordsToDelete)
                 ->get()
-                ->each(static fn (Model $record) => $record->delete());
+                ->each(static fn(Model $record) => $record->delete());
 
             $childComponentContainers = $component->getChildComponentContainers();
 
@@ -148,7 +150,18 @@ class BlockEditor extends Builder
 
                     $itemData = $component->mutateRelationshipDataBeforeSave($itemData, record: $record);
 
-                    $record->fill($itemData)->save();
+                    if ($activeLocale && $record instanceof Block) {
+                        // Handle locale saving.
+                        $record->fill(Arr::except($itemData, $record->getTranslatableAttributes()));
+
+                        foreach (Arr::only($itemData, $record->getTranslatableAttributes()) as $key => $value) {
+                            $record->setTranslation($key, $activeLocale, $value);
+                        }
+
+                        $record->save();
+                    } else {
+                        $record->fill($itemData)->save();
+                    }
 
                     continue;
                 }
@@ -164,9 +177,19 @@ class BlockEditor extends Builder
                 /** @var ComponentContainer $item */
                 $itemData = $component->mutateRelationshipDataBeforeCreate($itemData, $item->getParentComponent());
 
-                $record->fill($itemData);
+                if ($activeLocale && $record instanceof Block) {
+                    // Handle locale saving.
+                    $record->fill(Arr::except($itemData, $record->getTranslatableAttributes()));
+
+                    foreach (Arr::only($itemData, $record->getTranslatableAttributes()) as $key => $value) {
+                        $record->setTranslation($key, $activeLocale, $value);
+                    }
+                } else {
+                    $record->fill($itemData);
+                }
 
                 $record = $relationship->save($record);
+
                 $item->model($record)->saveRelationships();
             }
         });
@@ -215,7 +238,7 @@ class BlockEditor extends Builder
         $relatedKeyName = $relationship->getRelated()->getKeyName();
 
         return $this->cachedExistingRecords = $relationshipQuery->get()->mapWithKeys(
-            fn (Model $item): array => ["record-{$item[$relatedKeyName]}" => $item],
+            fn(Model $item): array => ["record-{$item[$relatedKeyName]}" => $item],
         );
     }
 
