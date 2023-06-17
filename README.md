@@ -75,6 +75,24 @@ This will create 2 files:
 
 The default generator provides just a 'title' field.
 
+**NOTE**: All fields are translatable by default. However you can have shared fields by adding the following method
+with the field id's:
+
+```php
+public static function getSharedFields(): array
+{
+    return ['show'];
+}
+
+public function form(): array
+{
+    return [
+        TextInput::make('title'),
+        Toggle::make('show')
+    ];
+}
+```
+
 ### 2. Add the contract and trait to your model
 
 In order to save blocks, you need to add the Blockable interface and HasBlocks trait to your model.

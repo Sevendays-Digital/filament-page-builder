@@ -25,6 +25,7 @@ class FilamentPageBuilderServiceProvider extends PluginServiceProvider
             ->hasViews(static::$name)
             ->runsMigrations()
             ->hasMigration('2023_02_07_153528_create_blocks_table')
+            ->hasMigration('2023_06_17_183553_add_shared_to_blocks')
             ->hasCommand(MakePageBuilderBlock::class);
     }
 

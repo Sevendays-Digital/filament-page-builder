@@ -319,12 +319,19 @@ class BlockEditor extends Builder
 
         $data['type'] = $record->type;
 
+        $block = $this->getBlock($record->type);
+        $untranslatableFields = $block::getSharedFields();
+
         $newData = [];
         foreach ($data as $field => $value) {
             if (in_array($field, $this->coreFields, true)) {
                 $newData[$field] = $value;
             } else {
-                $newData['content'][$field] = $value;
+                if (in_array($field, $untranslatableFields)) {
+                    $newData['shared'][$field] = $value;
+                } else {
+                    $newData['content'][$field] = $value;
+                }
             }
         }
 
@@ -341,6 +348,11 @@ class BlockEditor extends Builder
 
         if (is_array($data['content'])) {
             foreach ($data['content'] as $field => $value) {
+                if (! in_array($field, $this->coreFields, true)) {
+                    $data['data'][$field] = $value;
+                }
+            }
+            foreach ($data['shared'] ?? [] as $field => $value) {
                 if (! in_array($field, $this->coreFields, true)) {
                     $data['data'][$field] = $value;
                 }

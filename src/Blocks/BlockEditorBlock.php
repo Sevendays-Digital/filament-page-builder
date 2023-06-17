@@ -14,6 +14,14 @@ abstract class BlockEditorBlock extends Block
         return Str::afterLast(static::class, '\\');
     }
 
+    /**
+     * You can use this to mark certain fields to be non translatable.
+     */
+    public static function getSharedFields(): array
+    {
+        return [];
+    }
+
     abstract public function form(): array;
 
     abstract public function renderDisplay(array $state): string|View;

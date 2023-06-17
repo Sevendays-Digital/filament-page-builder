@@ -8,19 +8,20 @@ use Spatie\Translatable\HasTranslations;
 
 class Block extends Model
 {
-    // @todo: Translations is a full todo.
     use HasTranslations;
 
     public $translatable = ['content'];
 
     protected $fillable = [
         'content',
+        'shared',
         'type',
         'position',
     ];
 
     protected $casts = [
         'content' => 'array',
+        'shared' => 'array'
     ];
 
     public function blockable(): MorphTo
