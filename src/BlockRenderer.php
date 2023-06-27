@@ -37,7 +37,7 @@ class BlockRenderer
         $classes = collect($this->filesystem->allFiles($blocksDirectory))
             ->map(function (SplFileInfo $file) use ($namespace) {
                 $variableNamespace = $namespace->contains('*') ? str_ireplace(
-                    ['\\' . $namespace->before('*'), $namespace->after('*')],
+                    ['\\'.$namespace->before('*'), $namespace->after('*')],
                     ['', ''],
                     Str::of($file->getPath())
                         ->after(base_path())
@@ -45,10 +45,10 @@ class BlockRenderer
                 ) : null;
 
                 if (is_string($variableNamespace)) {
-                    $variableNamespace = (string)Str::of($variableNamespace)->before('\\');
+                    $variableNamespace = (string) Str::of($variableNamespace)->before('\\');
                 }
 
-                return (string)$namespace
+                return (string) $namespace
                     ->append('\\', $file->getRelativePathname())
                     ->replace('*', $variableNamespace)
                     ->replace(['/', '.php'], ['\\', '']);
@@ -66,7 +66,9 @@ class BlockRenderer
     {
         /** @var class-string<BlockEditorBlock> $class */
         if ($class = ($this->getAllBlocks()[$block->type] ?? false)) {
-            return $class::make($block->type)->renderDisplay([...$block->content, ...$block->shared]);
+            $content = is_array($block->shared) ? [...$block->content, ...$block->shared] : $block->content;
+
+            return $class::make($block->type)->renderDisplay($content);
         }
 
         return '';
