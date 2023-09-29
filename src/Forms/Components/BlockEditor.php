@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use PHPUnit\Exception;
+
 
 class BlockEditor extends Builder
 {
@@ -77,18 +77,20 @@ class BlockEditor extends Builder
 
         $records = $relationship ? $this->getCachedExistingRecords() : null;
 
-        return collect($this->getState())
+        $container = collect($this->getState())
             ->filter(fn(array $itemData): bool => $this->hasBlock($itemData['type']))
             ->map(
                 fn(array $itemData, $itemIndex): ComponentContainer => $this
                     ->getBlock($itemData['type'])
                     ->getChildComponentContainer()
                     ->model($relationship ? $records[$itemIndex] ?? $this->getRelatedModel() : null)
-                    ->getClone()
                     ->statePath("{$itemIndex}.data")
-                    ->inlineLabel(false),
+                    ->inlineLabel(false)
+                    ->getClone(),
             )
             ->all();
+
+       return $container;
     }
 
     public function relationship(string|Closure|null $name = null, ?Closure $callback = null): static
@@ -105,7 +107,7 @@ class BlockEditor extends Builder
         });
 
         $this->saveRelationshipsUsing(static function (BlockEditor $component, HasForms $livewire, ?array $state) {
-            if (! is_array($state)) {
+            if (!is_array($state)) {
                 $state = [];
             }
 
@@ -124,7 +126,9 @@ class BlockEditor extends Builder
             }
 
             $relationship
-                ->whereIn($relationship->getRelated()->getQualifiedKeyName(), $recordsToDelete)
+                //todo check if we can use same way as in Repeater
+                //->whereIn($relationship->getRelated()->getQualifiedKeyName(), $recordsToDelete)
+                ->whereKey($recordsToDelete)
                 ->get()
                 ->each(static fn(Model $record) => $record->delete());
 
@@ -133,7 +137,8 @@ class BlockEditor extends Builder
             $itemOrder = 1;
             $orderColumn = $component->getOrderColumn();
 
-            $activeLocale = $livewire->getActiveFormLocale();
+            $activeLocale = $livewire->getActiveFormsLocale();
+            $translatableContentDriver = $livewire->makeFilamentTranslatableContentDriver();
 
             foreach ($childComponentContainers as $itemKey => $item) {
                 $itemData = $item->getState(shouldCallHooksBefore: false);
@@ -146,24 +151,30 @@ class BlockEditor extends Builder
 
                 /** @var Model $record */
                 if ($record = ($existingRecords[$itemKey] ?? null)) {
-                    $activeLocale && method_exists($record, 'setLocale') && $record->setLocale($activeLocale);
+                    //$activeLocale && method_exists($record, 'setLocale') && $record->setLocale($activeLocale);
 
                     $itemData = $component->mutateRelationshipDataBeforeSave($itemData, record: $record);
 
-                    if ($activeLocale && $record instanceof Block) {
-                        // Handle locale saving.
-                        $record->fill(Arr::except($itemData, $record->getTranslatableAttributes()));
-
-                        foreach (Arr::only($itemData, $record->getTranslatableAttributes()) as $key => $value) {
-                            $record->setTranslation($key, $activeLocale, $value);
-                        }
-
-                        $record->save();
-                    } else {
+                    $translatableContentDriver ?
+                        $translatableContentDriver->updateRecord($record, $itemData) :
                         $record->fill($itemData)->save();
-                    }
 
                     continue;
+
+//                    if ($activeLocale && $record instanceof Block) {
+//                        // Handle locale saving.
+//                        $record->fill(Arr::except($itemData, $record->getTranslatableAttributes()));
+//
+//                        foreach (Arr::only($itemData, $record->getTranslatableAttributes()) as $key => $value) {
+//                            $record->setTranslation($key, $activeLocale, $value);
+//                        }
+//
+//                        $record->save();
+//                    } else {
+//                        $record->fill($itemData)->save();
+//                    }
+//
+//                    continue;
                 }
 
                 $relatedModel = $component->getRelatedModel();
@@ -180,16 +191,15 @@ class BlockEditor extends Builder
                 if ($activeLocale && $record instanceof Block) {
                     // Handle locale saving.
                     $record->fill(Arr::except($itemData, $record->getTranslatableAttributes()));
-
                     foreach (Arr::only($itemData, $record->getTranslatableAttributes()) as $key => $value) {
                         $record->setTranslation($key, $activeLocale, $value);
                     }
+
                 } else {
                     $record->fill($itemData);
                 }
 
                 $record = $relationship->save($record);
-
                 $item->model($record)->saveRelationships();
             }
         });
@@ -244,7 +254,7 @@ class BlockEditor extends Builder
 
     public function getRelationship(): HasOneOrMany|BelongsToMany|null
     {
-        if (! $this->hasRelationship()) {
+        if (!$this->hasRelationship()) {
             return null;
         }
 
@@ -263,29 +273,23 @@ class BlockEditor extends Builder
 
     protected function getStateFromRelatedRecords(Collection $records): array
     {
-        if (! $records->count()) {
+        if (!$records->count()) {
             return [];
         }
 
-        $activeLocale = $this->getLivewire()->getActiveFormLocale();
+        $translatableContentDriver = $this->getLivewire()->makeFilamentTranslatableContentDriver();
 
-        return $records
-            ->map(function (Model $record) use ($activeLocale): array {
-                $state = $record->attributesToArray();
+        $state = $records
+            ->map(function (Model $record) use ($translatableContentDriver): array {
+                $data = $translatableContentDriver ?
+                    $translatableContentDriver->getRecordAttributesToArray($record) :
+                    $record->attributesToArray();
 
-                if (
-                    $activeLocale &&
-                    method_exists($record, 'getTranslatableAttributes') &&
-                    method_exists($record, 'getTranslation')
-                ) {
-                    foreach ($record->getTranslatableAttributes() as $attribute) {
-                        $state[$attribute] = $record->getTranslation($attribute, $activeLocale);
-                    }
-                }
-
-                return $this->mutateRelationshipDataBeforeFill($state);
+                return $this->mutateRelationshipDataBeforeFill($data);
             })
             ->toArray();
+
+        return $state;
     }
 
     public function mutateRelationshipDataBeforeCreate(array $data, BlockEditorBlock $item): array
@@ -348,12 +352,12 @@ class BlockEditor extends Builder
 
         if (is_array($data['content'])) {
             foreach ($data['content'] as $field => $value) {
-                if (! in_array($field, $this->coreFields, true)) {
+                if (!in_array($field, $this->coreFields, true)) {
                     $data['data'][$field] = $value;
                 }
             }
             foreach ($data['shared'] ?? [] as $field => $value) {
-                if (! in_array($field, $this->coreFields, true)) {
+                if (!in_array($field, $this->coreFields, true)) {
                     $data['data'][$field] = $value;
                 }
             }
@@ -378,16 +382,22 @@ class BlockEditor extends Builder
 
     public function preview(ComponentContainer $container): View|string
     {
-        if (! $view = $this->evaluate($this->renderInView)) {
+        if (!$view = $this->evaluate($this->renderInView)) {
             return __('renderInView not set or null');
         }
 
         try {
+            $state = [];
+            try{
+                $state = $container->getState(false);
+            }
+            catch (\Illuminate\Validation\ValidationException $e){}
+
             return view(
                 $view,
-                ['preview' => $container->getParentComponent()->renderDisplay($container->getState())]
+                ['preview' => $container->getParentComponent()->renderDisplay($state)]
             );
-        } catch (ErrorException|Exception $e) {
+        } catch (ErrorException|\Exception $e) {
             return __('Error when rendering: :phError', ['phError' => $e->getMessage()]);
         }
     }
