@@ -28,7 +28,7 @@
         }}
     >
         <div x-bind:class="{ 'inset-0 fixed z-30 bg-black/80  h-screen w-screen overscroll-contain gap-4 flex': showModal }">
-            <div x-bind:class="{ 'p-4 m-6 bg-white w-full grow flex md:flex-rows relative rounded-lg': showModal }">
+            <div x-bind:class="{ 'p-4 m-6 bg-gray-50 w-full grow flex md:flex-rows relative rounded-lg': showModal }" @click.outside="showModal=false">
                 <div x-bind:class="{ 'basis-1/3 p-4 overflow-y-auto flex flex-col w-full ': showModal }">
                     <div class="flex flex-row justify-between mb-4 items-center">
                         @if ((count($containers) > 1) && $isCollapsible)
@@ -41,13 +41,10 @@
                                 </span>
                             </div>
                         @endif
+
                         <div>
                             <x-filament::button wire:key="open-visual-builder" x-on:click="showModal = true"
                                                 x-show="showModal === false">Visual
-                                builder
-                            </x-filament::button>
-                            <x-filament::button wire:key="close-visual-builder" x-on:click="showModal = false"
-                                                x-show="showModal === true">Close visual
                                 builder
                             </x-filament::button>
                         </div>
@@ -234,24 +231,35 @@
                         @endif
                     </div>
                 </div>
-                <div class="basis-2/3 p-4 overflow-y-auto flex flex-col items-center gap-4" x-show="showModal" x-data="{ breakpoint: 'max-w-full' }">
+                <div class="basis-2/3 p-4 mt-[1rem] overflow-y-auto flex flex-col items-center gap-4" x-show="showModal" x-data="{ breakpoint: 'max-w-full' }">
                     <div class="fixed top-8 right-8 text-black/80 cursor-pointer" x-on:click="showModal = false"
                          title="close">
-                        <x-heroicon-s-x-mark class="h-8"/>
+                        <x-filament::icon-button
+                            color="gray"
+                            icon="heroicon-o-x-mark"
+                            icon-alias="modal.close-button"
+                            icon-size="lg"
+                            :label="__('filament::components/modal.actions.close.label')"
+                            tabindex="-1"
+                            class="fi-modal-close-btn -m-1.5"
+                        />
                     </div>
-                    <div class="flex flex-row gap-2">
-                        <x-filament::button x-on:click="breakpoint = 'max-w-sm'">Mobile</x-filament::button>
-                        <x-filament::button x-on:click="breakpoint = 'max-w-3xl'">Tablet</x-filament::button>
-                        <x-filament::button x-on:click="breakpoint = 'max-w-full'">Desktop</x-filament::button>
-                    </div>
+{{--                    todo breakpoints not working, disabled for now--}}
+{{--                    <div class="flex flex-row gap-2">--}}
+{{--                        <x-filament::button x-on:click="breakpoint = 'max-w-sm'">Mobile</x-filament::button>--}}
+{{--                        <x-filament::button x-on:click="breakpoint = 'max-w-3xl'">Tablet</x-filament::button>--}}
+{{--                        <x-filament::button x-on:click="breakpoint = 'max-w-full'">Desktop</x-filament::button>--}}
+{{--                    </div>--}}
+                    @if($containers)
                     <div x-bind:class="breakpoint"
-                         class="w-full rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-white/5 dark:ring-white/10 transition-all">
+                         class="w-full bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-white/5 dark:ring-white/10 transition-all">
                         @foreach ($containers as $uuid => $item)
                             <user-card>
                                 {!! $preview($item) !!}
                             </user-card>
                         @endforeach
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
