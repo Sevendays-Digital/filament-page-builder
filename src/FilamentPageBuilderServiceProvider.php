@@ -1,11 +1,11 @@
 <?php
 
-namespace Haringsrob\FilamentPageBuilder;
+namespace Sevendays\FilamentPageBuilder;
 
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
-use Haringsrob\FilamentPageBuilder\Commands\MakePageBuilderBlock;
 use Illuminate\Filesystem\Filesystem;
+use Sevendays\FilamentPageBuilder\Commands\MakePageBuilderBlock;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -26,8 +26,8 @@ class FilamentPageBuilderServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         FilamentAsset::register([
-            Css::make('plugin-filament-page-builder', __DIR__ . '/../resources/dist/filament-page-builder.css'),
-        ], 'haringsrob/filament-page-builder');
+            Css::make('plugin-filament-page-builder', __DIR__.'/../resources/dist/filament-page-builder.css'),
+        ], 'sevendays/filament-page-builder');
     }
 
     public function register(): void

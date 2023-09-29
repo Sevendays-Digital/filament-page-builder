@@ -1,21 +1,21 @@
 <?php
 
-namespace Haringsrob\FilamentPageBuilder\Forms\Components;
+namespace Sevendays\FilamentPageBuilder\Forms\Components;
 
 use Closure;
 use ErrorException;
 use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Contracts\HasForms;
-use Haringsrob\FilamentPageBuilder\Blocks\BlockEditorBlock;
-use Haringsrob\FilamentPageBuilder\Models\Block;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-
+use Livewire\Component;
+use Sevendays\FilamentPageBuilder\Blocks\BlockEditorBlock;
+use Sevendays\FilamentPageBuilder\Models\Block;
 
 class BlockEditor extends Builder
 {
@@ -78,9 +78,9 @@ class BlockEditor extends Builder
         $records = $relationship ? $this->getCachedExistingRecords() : null;
 
         $container = collect($this->getState())
-            ->filter(fn(array $itemData): bool => $this->hasBlock($itemData['type']))
+            ->filter(fn (array $itemData): bool => $this->hasBlock($itemData['type']))
             ->map(
-                fn(array $itemData, $itemIndex): ComponentContainer => $this
+                fn (array $itemData, $itemIndex): ComponentContainer => $this
                     ->getBlock($itemData['type'])
                     ->getChildComponentContainer()
                     ->model($relationship ? $records[$itemIndex] ?? $this->getRelatedModel() : null)
@@ -90,10 +90,10 @@ class BlockEditor extends Builder
             )
             ->all();
 
-       return $container;
+        return $container;
     }
 
-    public function relationship(string|Closure|null $name = null, ?Closure $callback = null): static
+    public function relationship(string|Closure $name = null, Closure $callback = null): static
     {
         $this->relationship = $name ?? $this->getName();
         $this->modifyRelationshipQueryUsing = $callback;
@@ -107,7 +107,7 @@ class BlockEditor extends Builder
         });
 
         $this->saveRelationshipsUsing(static function (BlockEditor $component, HasForms $livewire, ?array $state) {
-            if (!is_array($state)) {
+            if (! is_array($state)) {
                 $state = [];
             }
 
@@ -130,7 +130,7 @@ class BlockEditor extends Builder
                 //->whereIn($relationship->getRelated()->getQualifiedKeyName(), $recordsToDelete)
                 ->whereKey($recordsToDelete)
                 ->get()
-                ->each(static fn(Model $record) => $record->delete());
+                ->each(static fn (Model $record) => $record->delete());
 
             $childComponentContainers = $component->getChildComponentContainers();
 
@@ -161,20 +161,20 @@ class BlockEditor extends Builder
 
                     continue;
 
-//                    if ($activeLocale && $record instanceof Block) {
-//                        // Handle locale saving.
-//                        $record->fill(Arr::except($itemData, $record->getTranslatableAttributes()));
-//
-//                        foreach (Arr::only($itemData, $record->getTranslatableAttributes()) as $key => $value) {
-//                            $record->setTranslation($key, $activeLocale, $value);
-//                        }
-//
-//                        $record->save();
-//                    } else {
-//                        $record->fill($itemData)->save();
-//                    }
-//
-//                    continue;
+                    //                    if ($activeLocale && $record instanceof Block) {
+                    //                        // Handle locale saving.
+                    //                        $record->fill(Arr::except($itemData, $record->getTranslatableAttributes()));
+                    //
+                    //                        foreach (Arr::only($itemData, $record->getTranslatableAttributes()) as $key => $value) {
+                    //                            $record->setTranslation($key, $activeLocale, $value);
+                    //                        }
+                    //
+                    //                        $record->save();
+                    //                    } else {
+                    //                        $record->fill($itemData)->save();
+                    //                    }
+                    //
+                    //                    continue;
                 }
 
                 $relatedModel = $component->getRelatedModel();
@@ -248,13 +248,13 @@ class BlockEditor extends Builder
         $relatedKeyName = $relationship->getRelated()->getKeyName();
 
         return $this->cachedExistingRecords = $relationshipQuery->get()->mapWithKeys(
-            fn(Model $item): array => ["record-{$item[$relatedKeyName]}" => $item],
+            fn (Model $item): array => ["record-{$item[$relatedKeyName]}" => $item],
         );
     }
 
     public function getRelationship(): HasOneOrMany|BelongsToMany|null
     {
-        if (!$this->hasRelationship()) {
+        if (! $this->hasRelationship()) {
             return null;
         }
 
@@ -273,7 +273,7 @@ class BlockEditor extends Builder
 
     protected function getStateFromRelatedRecords(Collection $records): array
     {
-        if (!$records->count()) {
+        if (! $records->count()) {
             return [];
         }
 
@@ -292,7 +292,7 @@ class BlockEditor extends Builder
         return $state;
     }
 
-    public function mutateRelationshipDataBeforeCreate(array $data, BlockEditorBlock $item): array
+    public function mutateRelationshipDataBeforeCreate(array $data, Component|null|BlockEditorBlock $item): array
     {
         if ($this->mutateRelationshipDataBeforeCreateUsing instanceof Closure) {
             $data = $this->evaluate($this->mutateRelationshipDataBeforeCreateUsing, [
@@ -352,12 +352,12 @@ class BlockEditor extends Builder
 
         if (is_array($data['content'])) {
             foreach ($data['content'] as $field => $value) {
-                if (!in_array($field, $this->coreFields, true)) {
+                if (! in_array($field, $this->coreFields, true)) {
                     $data['data'][$field] = $value;
                 }
             }
             foreach ($data['shared'] ?? [] as $field => $value) {
-                if (!in_array($field, $this->coreFields, true)) {
+                if (! in_array($field, $this->coreFields, true)) {
                     $data['data'][$field] = $value;
                 }
             }
@@ -382,16 +382,16 @@ class BlockEditor extends Builder
 
     public function preview(ComponentContainer $container): View|string
     {
-        if (!$view = $this->evaluate($this->renderInView)) {
+        if (! $view = $this->evaluate($this->renderInView)) {
             return __('renderInView not set or null');
         }
 
         try {
             $state = [];
-            try{
+            try {
                 $state = $container->getState(false);
+            } catch (\Illuminate\Validation\ValidationException $e) {
             }
-            catch (\Illuminate\Validation\ValidationException $e){}
 
             return view(
                 $view,
