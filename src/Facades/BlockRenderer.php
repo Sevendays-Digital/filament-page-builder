@@ -1,6 +1,6 @@
 <?php
 
-namespace Haringsrob\FilamentPageBuilder\Facades;
+namespace Sevendays\FilamentPageBuilder\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

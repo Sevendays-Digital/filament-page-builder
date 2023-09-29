@@ -1,6 +1,6 @@
 <?php
 
-namespace Haringsrob\FilamentPageBuilder\Commands;
+namespace Sevendays\FilamentPageBuilder\Commands;
 
 use Closure;
 use Illuminate\Console\GeneratorCommand;
@@ -32,13 +32,15 @@ class MakePageBuilderBlock extends GeneratorCommand
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): bool
     {
         if (parent::handle() === false && ! $this->option('force')) {
             return false;
         }
 
-        return $this->writeView();
+        $this->writeView();
+
+        return true;
     }
 
     /**
@@ -67,7 +69,7 @@ class MakePageBuilderBlock extends GeneratorCommand
     /**
      * Write the view for the component.
      */
-    protected function writeView(?Closure $onSuccess = null): void
+    protected function writeView(Closure $onSuccess = null): void
     {
         $path = $this->viewPath(
             str_replace('.', '/', 'filament.blocks.'.$this->getView()).'.blade.php'

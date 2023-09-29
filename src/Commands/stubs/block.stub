@@ -3,7 +3,7 @@
 namespace {{ namespace }};
 
 use Filament\Forms\Components\TextInput;
-use Haringsrob\FilamentPageBuilder\Blocks\BlockEditorBlock;
+use Sevendays\FilamentPageBuilder\Blocks\BlockEditorBlock;
 use Illuminate\Contracts\View\View;
 
 class {{ class }} extends BlockEditorBlock {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Haringsrob\FilamentPageBuilder\Models\Contracts;
+namespace Sevendays\FilamentPageBuilder\Models\Contracts;
 
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 

@@ -1,12 +1,13 @@
 <?php
 
-namespace Haringsrob\FilamentPageBuilder\Models\Traits;
+namespace Sevendays\FilamentPageBuilder\Models\Traits;
 
-use Haringsrob\FilamentPageBuilder\Models\Block;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Sevendays\FilamentPageBuilder\Models\Block;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Model;
+ * @extends Model;
  */
 trait HasBlocks
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Haringsrob\FilamentPageBuilder\Models;
+namespace Sevendays\FilamentPageBuilder\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -21,7 +21,7 @@ class Block extends Model
 
     protected $casts = [
         'content' => 'array',
-        'shared' => 'array'
+        'shared' => 'array',
     ];
 
     public function blockable(): MorphTo
