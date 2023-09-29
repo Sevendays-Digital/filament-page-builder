@@ -1,6 +1,6 @@
 <?php
 
-namespace Haringsrob\FilamentPageBuilder\Blocks;
+namespace Sevendays\FilamentPageBuilder\Blocks;
 
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\Field;

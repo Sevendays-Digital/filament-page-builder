@@ -1,17 +1,24 @@
 {
-    "name": "haringsrob/filament-page-builder",
+    "name": "sevendays/filament-page-builder",
     "description": "A visual page builder for Filament",
     "keywords": [
+        "Sevendays",
         "haringsrob",
         "laravel",
+        "filamentphp",
         "filament-page-builder"
     ],
-    "homepage": "https://github.com/haringsrob/filament-page-builder",
+    "homepage": "https://github.com/sevendays-digital/filament-page-builder",
     "license": "MIT",
     "authors": [
         {
             "name": "Harings Rob",
             "email": "haringsrob@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Michael Metdepenningen",
+            "email": "michael@sevendays.be",
             "role": "Developer"
         }
     ],
@@ -37,13 +44,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Haringsrob\\FilamentPageBuilder\\": "src",
-            "Haringsrob\\FilamentPageBuilder\\Database\\Factories\\": "database/factories"
+            "Sevendays\\FilamentPageBuilder\\": "src",
+            "Sevendays\\FilamentPageBuilder\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Haringsrob\\FilamentPageBuilder\\Tests\\": "tests"
+            "Sevendays\\FilamentPageBuilder\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -66,10 +73,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Haringsrob\\FilamentPageBuilder\\FilamentPageBuilderServiceProvider"
+                "Sevendays\\FilamentPageBuilder\\FilamentPageBuilderServiceProvider"
             ],
             "aliases": {
-                "FilamentPageBuilder": "Haringsrob\\FilamentPageBuilder\\Facades\\FilamentPageBuilder"
+                "FilamentPageBuilder": "Sevendays\\FilamentPageBuilder\\Facades\\FilamentPageBuilder"
             }
         }
     },

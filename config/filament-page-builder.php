@@ -1,6 +1,6 @@
 <?php
 
-// config for Haringsrob/FilamentPageBuilder
+// config for Sevendays/FilamentPageBuilder
 return [
 
 ];

@@ -1,12 +1,12 @@
 <?php
 
-namespace Haringsrob\FilamentPageBuilder;
+namespace Sevendays\FilamentPageBuilder;
 
-use Haringsrob\FilamentPageBuilder\Blocks\BlockEditorBlock;
-use Haringsrob\FilamentPageBuilder\Models\Block;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
+use Sevendays\FilamentPageBuilder\Blocks\BlockEditorBlock;
+use Sevendays\FilamentPageBuilder\Models\Block;
 use SplFileInfo;
 
 class BlockRenderer
