@@ -2,6 +2,7 @@
 
 namespace Sevendays\FilamentPageBuilder;
 
+use Filament\Facades\Filament;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
@@ -32,7 +33,7 @@ class BlockRenderer
             return [];
         }
 
-        $namespace = Str::of(config('filament.resources.namespace'))->beforeLast('\\')->append('\\Blocks*');
+        $namespace = Str::of(Filament::getCurrentPanel()->getResourceNamespaces()[0])->beforeLast('\\')->append('\\Blocks*');
 
         $classes = collect($this->filesystem->allFiles($blocksDirectory))
             ->map(function (SplFileInfo $file) use ($namespace) {
@@ -66,7 +67,12 @@ class BlockRenderer
     {
         /** @var class-string<BlockEditorBlock> $class */
         if ($class = ($this->getAllBlocks()[$block->type] ?? false)) {
-            $content = is_array($block->shared) ? [...$block->content, ...$block->shared] : $block->content;
+            $pageContent = $block->content;
+            //todo dirty hack to 'detect' if translations are in use ...
+            if($block->content === ''){
+                $pageContent = $block->translations['content'];
+            }
+            $content = is_array($block->shared) ? [...$pageContent, ...$block->shared] : $pageContent;
 
             return $class::make($block->type)->renderDisplay($content);
         }
