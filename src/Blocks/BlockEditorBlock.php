@@ -29,9 +29,11 @@ abstract class BlockEditorBlock extends Block
     public function getChildComponents(): array
     {
         $formFields = $this->form();
-        /** @var Field $field */
-        foreach ($formFields as $field) {
-            $field->debounce()->reactive();
+        if(config('filament-page-builder.enablePreview')){
+            /** @var Field $field */
+            foreach ($formFields as $field) {
+                $field->debounce()->reactive();
+            }
         }
 
         return $formFields;

@@ -57,6 +57,18 @@ return [
 
 Filament page builder is a custom Filament field that adds functionality on top of the Builder field.
 
+13-11-2023 Preview is now opt-in via config.
+- Preview can interfere with forms configured within blocks
+- Preview sets all block fields to reactive, for the 'live' preview part
+
+If you are ok with that, you can enable the preview via:
+```php
+return [
+    'enablePreview' => true,
+];
+
+```
+
 To use this, create a Model and Resource as per the Filament documentation then do the following:
 
 ### 1. Generate a block

@@ -60,13 +60,14 @@
                                 @endif
                             </div>
                         @endif
-
-                        <div>
-                            <x-filament::button wire:key="open-visual-builder" x-on:click="showModal = true"
-                                                x-show="showModal === false">Visual
-                                builder
-                            </x-filament::button>
-                        </div>
+                        @if(config('filament-page-builder.enablePreview'))
+                            <div>
+                                <x-filament::button wire:key="open-visual-builder" x-on:click="showModal = true"
+                                                    x-show="showModal === false">Visual
+                                    builder
+                                </x-filament::button>
+                            </div>
+                        @endif
                     </div>
                     <div class="grid gap-y-4">
                         @if (count($containers))
@@ -268,36 +269,38 @@
                         @endif
                     </div>
                 </div>
-                <div class="basis-2/3 p-4 mt-[1rem] overflow-y-auto flex flex-col items-center gap-4" x-show="showModal" x-data="{ breakpoint: 'max-w-full' }">
-                    <div class="fixed top-8 right-8 text-black/80 cursor-pointer" x-on:click="showModal = false"
-                         title="close">
-                        <x-filament::icon-button
-                            color="gray"
-                            icon="heroicon-o-x-mark"
-                            icon-alias="modal.close-button"
-                            icon-size="lg"
-                            :label="__('filament::components/modal.actions.close.label')"
-                            tabindex="-1"
-                            class="fi-modal-close-btn -m-1.5"
-                        />
+                @if(config('filament-page-builder.enablePreview'))
+                    <div class="basis-2/3 p-4 mt-[1rem] overflow-y-auto flex flex-col items-center gap-4" x-show="showModal" x-data="{ breakpoint: 'max-w-full' }">
+                        <div class="fixed top-8 right-8 text-black/80 cursor-pointer" x-on:click="showModal = false"
+                             title="close">
+                            <x-filament::icon-button
+                                color="gray"
+                                icon="heroicon-o-x-mark"
+                                icon-alias="modal.close-button"
+                                icon-size="lg"
+                                :label="__('filament::components/modal.actions.close.label')"
+                                tabindex="-1"
+                                class="fi-modal-close-btn -m-1.5"
+                            />
+                        </div>
+    {{--                    todo breakpoints not working, disabled for now--}}
+    {{--                    <div class="flex flex-row gap-2">--}}
+    {{--                        <x-filament::button x-on:click="breakpoint = 'max-w-sm'">Mobile</x-filament::button>--}}
+    {{--                        <x-filament::button x-on:click="breakpoint = 'max-w-3xl'">Tablet</x-filament::button>--}}
+    {{--                        <x-filament::button x-on:click="breakpoint = 'max-w-full'">Desktop</x-filament::button>--}}
+    {{--                    </div>--}}
+                        @if($containers)
+                        <div x-bind:class="breakpoint"
+                             class="w-full bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-white/5 dark:ring-white/10 transition-all">
+                            @foreach ($containers as $uuid => $item)
+                                <user-card>
+                                    {!! $preview($item) !!}
+                                </user-card>
+                            @endforeach
+                        </div>
+                        @endif
                     </div>
-{{--                    todo breakpoints not working, disabled for now--}}
-{{--                    <div class="flex flex-row gap-2">--}}
-{{--                        <x-filament::button x-on:click="breakpoint = 'max-w-sm'">Mobile</x-filament::button>--}}
-{{--                        <x-filament::button x-on:click="breakpoint = 'max-w-3xl'">Tablet</x-filament::button>--}}
-{{--                        <x-filament::button x-on:click="breakpoint = 'max-w-full'">Desktop</x-filament::button>--}}
-{{--                    </div>--}}
-                    @if($containers)
-                    <div x-bind:class="breakpoint"
-                         class="w-full bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-white/5 dark:ring-white/10 transition-all">
-                        @foreach ($containers as $uuid => $item)
-                            <user-card>
-                                {!! $preview($item) !!}
-                            </user-card>
-                        @endforeach
-                    </div>
-                    @endif
-                </div>
+                @endif
             </div>
         </div>
     </div>

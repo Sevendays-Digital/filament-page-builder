@@ -18,6 +18,7 @@ class FilamentPageBuilderServiceProvider extends PackageServiceProvider
     {
         $package->name(static::$name)
             ->hasViews()
+            ->hasConfigFile('filament-page-builder')
             ->runsMigrations()
             ->hasMigration('2023_02_07_153528_create_blocks_table')
             ->hasMigration('2023_06_17_183553_add_shared_to_blocks')
