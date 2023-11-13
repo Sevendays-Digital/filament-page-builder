@@ -15,7 +15,7 @@ abstract class BlockEditorBlock extends Block
     }
 
     /**
-     * You can use this to mark certain fields to be non translatable.
+     * You can use this to mark certain fields to be non-translatable.
      */
     public static function getSharedFields(): array
     {
@@ -29,7 +29,7 @@ abstract class BlockEditorBlock extends Block
     public function getChildComponents(): array
     {
         $formFields = $this->form();
-        if(config('filament-page-builder.enablePreview')){
+        if (config('filament-page-builder.enablePreview')) {
             /** @var Field $field */
             foreach ($formFields as $field) {
                 $field->debounce()->reactive();

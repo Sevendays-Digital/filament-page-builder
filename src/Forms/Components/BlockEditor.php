@@ -60,6 +60,7 @@ class BlockEditor extends Builder
         $list = [];
 
         foreach ($blocks as $block) {
+            /* @phpstan-ignore-next-line */
             $made = $block::make($block::getSystemName());
             if ($made instanceof BlockEditorBlock) {
                 $list[] = $made;
@@ -320,10 +321,13 @@ class BlockEditor extends Builder
                 'record' => $record,
             ]);
         }
+        /* @var string $type */
+        $type = $record['type'];
+        $data['type'] = $type;
 
-        $data['type'] = $record->type;
-
-        $block = $this->getBlock($record->type);
+        /* @var Block $block */
+        $block = $this->getBlock($type);
+        /* @phpstan-ignore-next-line */
         $untranslatableFields = $block::getSharedFields();
 
         $newData = [];
@@ -395,7 +399,7 @@ class BlockEditor extends Builder
 
             return view(
                 $view,
-                ['preview' => $container->getParentComponent()->renderDisplay($state)]
+                ['preview' => $container->getParentComponent()->renderDisplay($state)]            /* @phpstan-ignore-line */
             );
         } catch (ErrorException|\Exception $e) {
             return __('Error when rendering: :phError', ['phError' => $e->getMessage()]);

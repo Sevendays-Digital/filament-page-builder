@@ -65,11 +65,11 @@ class BlockRenderer
 
     public function renderBlock(Block $block): string|View
     {
-        /** @var class-string<BlockEditorBlock> $class */
+        /* @var class-string<BlockEditorBlock> $class */
         if ($class = ($this->getAllBlocks()[$block->type] ?? false)) {
             $pageContent = $block->content;
             //todo dirty hack to 'detect' if translations are in use ...
-            if($block->content === ''){
+            if ($block->content === '') {
                 $pageContent = $block->translations['content'];
             }
             $content = is_array($block->shared) ? [...$pageContent, ...$block->shared] : $pageContent;
