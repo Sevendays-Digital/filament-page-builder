@@ -33,10 +33,9 @@ class FilamentPageBuilderServiceProvider extends PackageServiceProvider
 
         // support 'empty' form blocks
         Block::creating(function (Block $model) {
-            if ($model->content == null) {
-                $model->content = [];
+            if(!array_key_exists('content', $model->getAttributes()) || $model->getAttributes()['content'] == null) {
+                $model->setAttribute('content', []);
             }
-
             return $model;
         });
     }
