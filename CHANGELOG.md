@@ -13,6 +13,8 @@ return [
 ];
 ```
 
+- blocks with no fields can now be added
+
 ## 3.0.5 Builder update Latest
 - update block-editor blade according to builder blade
 - bump min version of filament to 3.0.75
