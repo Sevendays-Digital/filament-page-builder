@@ -1,5 +1,6 @@
 # A visual page builder for Filament
 
+
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/sevendays/filament-page-builder.svg?style=flat-square)](https://packagist.org/packages/sevendays/filament-page-builder)
 [![run-tests](https://github.com/Sevendays-Digital/filament-page-builder/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Sevendays-Digital/filament-page-builder/actions/workflows/run-tests.yml)
 [![Fix PHP code style issues](https://github.com/Sevendays-Digital/filament-page-builder/actions/workflows/fix-php-code-style-issues.yml/badge.svg)](https://github.com/Sevendays-Digital/filament-page-builder/actions/workflows/fix-php-code-style-issues.yml)[![Total Downloads](https://img.shields.io/packagist/dt/sevendays/filament-page-builder.svg?style=flat-square)](https://packagist.org/packages/sevendays/filament-page-builder)
