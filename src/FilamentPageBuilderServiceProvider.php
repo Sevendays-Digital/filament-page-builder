@@ -6,6 +6,7 @@ use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Filesystem\Filesystem;
 use Sevendays\FilamentPageBuilder\Commands\MakePageBuilderBlock;
+use Sevendays\FilamentPageBuilder\Models\Block;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -28,6 +29,15 @@ class FilamentPageBuilderServiceProvider extends PackageServiceProvider
         FilamentAsset::register([
             Css::make('plugin-filament-page-builder', __DIR__.'/../resources/dist/filament-page-builder.css'),
         ], 'sevendays/filament-page-builder');
+
+        // support 'empty' form blocks
+        Block::creating(function (Block $model) {
+            if ($model->content == null) {
+                $model->content = [];
+            }
+
+            return $model;
+        });
     }
 
     public function register(): void
