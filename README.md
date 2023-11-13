@@ -1,9 +1,9 @@
 # A visual page builder for Filament
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/haringsrob/filament-page-builder.svg?style=flat-square)](https://packagist.org/packages/haringsrob/filament-page-builder)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/haringsrob/filament-page-builder/run-tests.yml?branch=main&label=tests)](https://github.com/haringsrob/filament-page-builder/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/haringsrob/filament-page-builder/fix-php-code-style-issues.yml?branch=main&label=code%20style)](https://github.com/haringsrob/filament-page-builder/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/haringsrob/filament-page-builder.svg?style=flat-square)](https://packagist.org/packages/haringsrob/filament-page-builder)
+
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/sevendays/filament-page-builder.svg?style=flat-square)](https://packagist.org/packages/sevendays/filament-page-builder)
+[![run-tests](https://github.com/Sevendays-Digital/filament-page-builder/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Sevendays-Digital/filament-page-builder/actions/workflows/run-tests.yml)
+[![Fix PHP code style issues](https://github.com/Sevendays-Digital/filament-page-builder/actions/workflows/fix-php-code-style-issues.yml/badge.svg)](https://github.com/Sevendays-Digital/filament-page-builder/actions/workflows/fix-php-code-style-issues.yml)[![Total Downloads](https://img.shields.io/packagist/dt/sevendays/filament-page-builder.svg?style=flat-square)](https://packagist.org/packages/sevendays/filament-page-builder)
 
 
 With this package you have a new Filament field (like Builder) but with a visual ui and dynamic types.
@@ -25,7 +25,7 @@ To see a demo:
 You can install the package via composer:
 
 ```bash
-composer require haringsrob/filament-page-builder
+composer require sevendays/filament-page-builder
 ```
 
 You can publish and run the migrations with:
@@ -57,6 +57,18 @@ return [
 ## Usage
 
 Filament page builder is a custom Filament field that adds functionality on top of the Builder field.
+
+13-11-2023 Preview is now opt-in via config.
+- Preview can interfere with forms configured within blocks
+- Preview sets all block fields to reactive, for the 'live' preview part
+
+If you are ok with that, you can enable the preview via:
+```php
+return [
+    'enablePreview' => true,
+];
+
+```
 
 To use this, create a Model and Resource as per the Filament documentation then do the following:
 
@@ -102,8 +114,8 @@ In order to save blocks, you need to add the Blockable interface and HasBlocks t
 
 namespace App\Models;
 
-use Haringsrob\FilamentPageBuilder\Models\Contracts\Blockable;
-use Haringsrob\FilamentPageBuilder\Models\Traits\HasBlocks;
+use Sevendays\FilamentPageBuilder\Models\Contracts\Blockable;
+use Sevendays\FilamentPageBuilder\Models\Traits\HasBlocks;
 use Illuminate\Database\Eloquent\Model;
 
 class Page extends Model implements Blockable
@@ -122,7 +134,7 @@ In your resource form we can now add the field:
 
 ```php
 <?php
-use Haringsrob\FilamentPageBuilder\Forms\Components\BlockEditor;
+use Sevendays\FilamentPageBuilder\Forms\Components\BlockEditor;
 use App\Filament\Blocks\DemoBlock;
 
 public static function form(Form $form): Form
@@ -146,7 +158,7 @@ There are not many tools for this yet but basic rendering works like this:
 
 ```php
 @foreach($page->blocks as $block)
-    {!! \Haringsrob\FilamentPageBuilder\Facades\BlockRenderer::renderBlock($block) !!}
+    {!! \Sevendays\FilamentPageBuilder\Facades\BlockRenderer::renderBlock($block) !!}
 @endforeach
 ```
 

@@ -24,8 +24,8 @@
     ],
     "require": {
         "php": "^8.1",
-        "filament/filament": "3.0-stable",
-        "filament/spatie-laravel-translatable-plugin": "^3.0-stable",
+        "filament/filament": "^3.0.75",
+        "filament/spatie-laravel-translatable-plugin": "^3.0",
         "illuminate/contracts": "^9.0|^10.0",
         "spatie/laravel-package-tools": "^1.13.5",
         "wire-elements/modal": "^2.0"
