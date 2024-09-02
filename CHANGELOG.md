@@ -2,6 +2,11 @@
 
 All notable changes to `filament-page-builder` will be documented in this file.
 
+
+## 3.0.8 Laravel 11 compatible
+
+## 3.0.7 minor fixes
+
 ## 3.0.6 Preview is now opt-in via config.
 - Preview can interfere with forms configured within blocks
 - Preview sets all block fields to reactive, for the 'live' preview part
