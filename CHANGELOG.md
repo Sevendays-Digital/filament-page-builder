@@ -3,6 +3,8 @@
 All notable changes to `filament-page-builder` will be documented in this file.
 
 
+## 3.0.9 Laravel 12 compatible
+
 ## 3.0.8 Laravel 11 compatible
 
 ## 3.0.7 minor fixes
