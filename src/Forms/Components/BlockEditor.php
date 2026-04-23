@@ -4,16 +4,16 @@ namespace Sevendays\FilamentPageBuilder\Forms\Components;
 
 use Closure;
 use ErrorException;
-use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components\Builder;
-use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Contracts\HasSchemas;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Livewire\Component;
 use Sevendays\FilamentPageBuilder\Blocks\BlockEditorBlock;
 use Sevendays\FilamentPageBuilder\Models\Block;
 
@@ -43,17 +43,16 @@ class BlockEditor extends Builder
 
     private array $coreFields = ['id', 'type', 'position'];
 
-    public function configure(): static
+    protected function setUp(): void
     {
-        parent::configure();
-        $this->relationship('blocks');
+        parent::setUp();
 
-        return $this;
+        $this->relationship('blocks');
     }
 
-    public function blocks(Closure|array $blocks): static
+    public function blocks(array|Closure $blocks): static
     {
-        if ($blocks instanceof \Closure) {
+        if ($blocks instanceof Closure) {
             throw new \Exception('Not supported yet.');
         }
 
@@ -72,42 +71,42 @@ class BlockEditor extends Builder
         return $this;
     }
 
-    public function getChildComponentContainers(bool $withHidden = false): array
+    /**
+     * @return array<Schema>
+     */
+    public function getItems(): array
     {
         $relationship = $this->getRelationship();
 
         $records = $relationship ? $this->getCachedExistingRecords() : null;
 
-        $container = collect($this->getState())
-            ->filter(fn (array $itemData): bool => $this->hasBlock($itemData['type']))
+        return collect($this->getRawState() ?? [])
+            ->filter(fn ($itemData): bool => is_array($itemData) && filled($itemData['type'] ?? null) && $this->hasBlock($itemData['type']))
             ->map(
-                fn (array $itemData, $itemIndex): ComponentContainer => $this
+                fn (array $itemData, $itemIndex): Schema => $this
                     ->getBlock($itemData['type'])
-                    ->getChildComponentContainer()
+                    ->getChildSchema()
                     ->model($relationship ? $records[$itemIndex] ?? $this->getRelatedModel() : null)
                     ->statePath("{$itemIndex}.data")
+                    ->constantState($itemData['data'] ?? [])
                     ->inlineLabel(false)
                     ->getClone(),
             )
             ->all();
-
-        return $container;
     }
 
-    public function relationship(string|Closure $name = null, Closure $callback = null): static
+    public function relationship(string|Closure|null $name = null, ?Closure $callback = null): static
     {
         $this->relationship = $name ?? $this->getName();
         $this->modifyRelationshipQueryUsing = $callback;
 
-        $this->afterStateHydrated(null);
-
-        $this->loadStateFromRelationshipsUsing(static function (BlockEditor $component) {
+        $this->loadStateFromRelationshipsUsing(static function (BlockEditor $component): void {
             $component->clearCachedExistingRecords();
 
             $component->fillFromRelationship();
         });
 
-        $this->saveRelationshipsUsing(static function (BlockEditor $component, HasForms $livewire, ?array $state) {
+        $this->saveRelationshipsUsing(static function (BlockEditor $component, HasSchemas $livewire, ?array $state): void {
             if (! is_array($state)) {
                 $state = [];
             }
@@ -127,21 +126,19 @@ class BlockEditor extends Builder
             }
 
             $relationship
-                //todo check if we can use same way as in Repeater
-                //->whereIn($relationship->getRelated()->getQualifiedKeyName(), $recordsToDelete)
                 ->whereKey($recordsToDelete)
                 ->get()
                 ->each(static fn (Model $record) => $record->delete());
 
-            $childComponentContainers = $component->getChildComponentContainers();
+            $childSchemas = $component->getItems();
 
             $itemOrder = 1;
             $orderColumn = $component->getOrderColumn();
 
-            $activeLocale = $livewire->getActiveFormsLocale();
+            $activeLocale = $livewire->getActiveSchemaLocale();
             $translatableContentDriver = $livewire->makeFilamentTranslatableContentDriver();
 
-            foreach ($childComponentContainers as $itemKey => $item) {
+            foreach ($childSchemas as $itemKey => $item) {
                 $itemData = $item->getState(shouldCallHooksBefore: false);
 
                 if ($orderColumn) {
@@ -150,10 +147,10 @@ class BlockEditor extends Builder
                     $itemOrder++;
                 }
 
-                /** @var Model $record */
-                if ($record = ($existingRecords[$itemKey] ?? null)) {
-                    //$activeLocale && method_exists($record, 'setLocale') && $record->setLocale($activeLocale);
+                /** @var Model|null $record */
+                $record = $existingRecords[$itemKey] ?? null;
 
+                if ($record) {
                     $itemData = $component->mutateRelationshipDataBeforeSave($itemData, record: $record);
 
                     $translatableContentDriver ?
@@ -161,21 +158,6 @@ class BlockEditor extends Builder
                         $record->fill($itemData)->save();
 
                     continue;
-
-                    //                    if ($activeLocale && $record instanceof Block) {
-                    //                        // Handle locale saving.
-                    //                        $record->fill(Arr::except($itemData, $record->getTranslatableAttributes()));
-                    //
-                    //                        foreach (Arr::only($itemData, $record->getTranslatableAttributes()) as $key => $value) {
-                    //                            $record->setTranslation($key, $activeLocale, $value);
-                    //                        }
-                    //
-                    //                        $record->save();
-                    //                    } else {
-                    //                        $record->fill($itemData)->save();
-                    //                    }
-                    //
-                    //                    continue;
                 }
 
                 $relatedModel = $component->getRelatedModel();
@@ -186,16 +168,14 @@ class BlockEditor extends Builder
                     $record->setLocale($activeLocale);
                 }
 
-                /** @var ComponentContainer $item */
                 $itemData = $component->mutateRelationshipDataBeforeCreate($itemData, $item->getParentComponent());
 
                 if ($activeLocale && $record instanceof Block) {
-                    // Handle locale saving.
                     $record->fill(Arr::except($itemData, $record->getTranslatableAttributes()));
+
                     foreach (Arr::only($itemData, $record->getTranslatableAttributes()) as $key => $value) {
                         $record->setTranslation($key, $activeLocale, $value);
                     }
-
                 } else {
                     $record->fill($itemData);
                 }
@@ -280,7 +260,7 @@ class BlockEditor extends Builder
 
         $translatableContentDriver = $this->getLivewire()->makeFilamentTranslatableContentDriver();
 
-        $state = $records
+        return $records
             ->map(function (Model $record) use ($translatableContentDriver): array {
                 $data = $translatableContentDriver ?
                     $translatableContentDriver->getRecordAttributesToArray($record) :
@@ -289,8 +269,6 @@ class BlockEditor extends Builder
                 return $this->mutateRelationshipDataBeforeFill($data);
             })
             ->toArray();
-
-        return $state;
     }
 
     public function mutateRelationshipDataBeforeCreate(array $data, Component|null|BlockEditorBlock $item): array
@@ -321,6 +299,7 @@ class BlockEditor extends Builder
                 'record' => $record,
             ]);
         }
+
         /* @var string $type */
         $type = $record['type'];
         $data['type'] = $type;
@@ -354,7 +333,7 @@ class BlockEditor extends Builder
             ]);
         }
 
-        if (is_array($data['content'])) {
+        if (is_array($data['content'] ?? null)) {
             foreach ($data['content'] as $field => $value) {
                 if (! in_array($field, $this->coreFields, true)) {
                     $data['data'][$field] = $value;
@@ -384,7 +363,7 @@ class BlockEditor extends Builder
         return $this;
     }
 
-    public function preview(ComponentContainer $container): View|string
+    public function preview(Schema $container): View|string
     {
         if (! $view = $this->evaluate($this->renderInView)) {
             return __('renderInView not set or null');
@@ -399,7 +378,7 @@ class BlockEditor extends Builder
 
             return view(
                 $view,
-                ['preview' => $container->getParentComponent()->renderDisplay($state)]            /* @phpstan-ignore-line */
+                ['preview' => $container->getParentComponent()->renderDisplay($state)] /* @phpstan-ignore-line */
             );
         } catch (ErrorException|\Exception $e) {
             return __('Error when rendering: :phError', ['phError' => $e->getMessage()]);

@@ -33,7 +33,8 @@ class BlockRenderer
             return [];
         }
 
-        $namespace = Str::of(Filament::getCurrentPanel()->getResourceNamespaces()[0])->beforeLast('\\')->append('\\Blocks*');
+        $panel = Filament::getCurrentPanel() ?? Filament::getDefaultPanel();
+        $namespace = Str::of($panel->getResourceNamespaces()[0])->beforeLast('\\')->append('\\Blocks*');
 
         $classes = collect($this->filesystem->allFiles($blocksDirectory))
             ->map(function (SplFileInfo $file) use ($namespace) {

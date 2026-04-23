@@ -69,7 +69,7 @@ class MakePageBuilderBlock extends GeneratorCommand
     /**
      * Write the view for the component.
      */
-    protected function writeView(Closure $onSuccess = null): void
+    protected function writeView(?Closure $onSuccess = null): void
     {
         $path = $this->viewPath(
             str_replace('.', '/', 'filament.blocks.'.$this->getView()).'.blade.php'
