@@ -14,9 +14,7 @@ class BlockRenderer
 {
     private ?array $cache = null;
 
-    public function __construct(protected Filesystem $filesystem)
-    {
-    }
+    public function __construct(protected Filesystem $filesystem) {}
 
     /**
      * @return class-string<BlockEditorBlock>[]
@@ -46,8 +44,8 @@ class BlockRenderer
                         ->replace(['/'], ['\\']),
                 ) : null;
 
-                if (is_string($variableNamespace)) {
-                    $variableNamespace = (string) Str::of($variableNamespace)->before('\\');
+                if ($variableNamespace !== null) {
+                    $variableNamespace = (string) Str::of((string) $variableNamespace)->before('\\');
                 }
 
                 return (string) $namespace
@@ -69,7 +67,7 @@ class BlockRenderer
         /* @var class-string<BlockEditorBlock> $class */
         if ($class = ($this->getAllBlocks()[$block->type] ?? false)) {
             $pageContent = $block->content;
-            //todo dirty hack to 'detect' if translations are in use ...
+            // todo dirty hack to 'detect' if translations are in use ...
             if ($block->content === '') {
                 $pageContent = $block->translations['content'];
             }

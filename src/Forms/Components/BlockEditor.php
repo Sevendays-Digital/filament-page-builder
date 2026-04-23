@@ -5,20 +5,20 @@ namespace Sevendays\FilamentPageBuilder\Forms\Components;
 use Closure;
 use ErrorException;
 use Filament\Forms\Components\Builder;
-use Filament\Schemas\Components\Component;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use Sevendays\FilamentPageBuilder\Blocks\BlockEditorBlock;
 use Sevendays\FilamentPageBuilder\Models\Block;
 
 class BlockEditor extends Builder
 {
+    /** @phpstan-ignore property.defaultValue */
     protected string $view = 'filament-page-builder::block-editor';
 
     protected bool|Closure|null $isCollapsible = true;
@@ -135,7 +135,6 @@ class BlockEditor extends Builder
             $itemOrder = 1;
             $orderColumn = $component->getOrderColumn();
 
-            $activeLocale = $livewire->getActiveSchemaLocale();
             $translatableContentDriver = $livewire->makeFilamentTranslatableContentDriver();
 
             foreach ($childSchemas as $itemKey => $item) {
@@ -162,21 +161,14 @@ class BlockEditor extends Builder
 
                 $relatedModel = $component->getRelatedModel();
 
-                $record = new $relatedModel();
+                /** @var BlockEditorBlock $parent */
+                $parent = $item->getParentComponent();
+                $itemData = $component->mutateRelationshipDataBeforeCreate($itemData, $parent);
 
-                if ($activeLocale && method_exists($record, 'setLocale')) {
-                    $record->setLocale($activeLocale);
-                }
-
-                $itemData = $component->mutateRelationshipDataBeforeCreate($itemData, $item->getParentComponent());
-
-                if ($activeLocale && $record instanceof Block) {
-                    $record->fill(Arr::except($itemData, $record->getTranslatableAttributes()));
-
-                    foreach (Arr::only($itemData, $record->getTranslatableAttributes()) as $key => $value) {
-                        $record->setTranslation($key, $activeLocale, $value);
-                    }
+                if ($translatableContentDriver) {
+                    $record = $translatableContentDriver->makeRecord($relatedModel, $itemData);
                 } else {
+                    $record = new $relatedModel;
                     $record->fill($itemData);
                 }
 
@@ -271,7 +263,7 @@ class BlockEditor extends Builder
             ->toArray();
     }
 
-    public function mutateRelationshipDataBeforeCreate(array $data, Component|null|BlockEditorBlock $item): array
+    public function mutateRelationshipDataBeforeCreate(array $data, BlockEditorBlock $item): array
     {
         if ($this->mutateRelationshipDataBeforeCreateUsing instanceof Closure) {
             $data = $this->evaluate($this->mutateRelationshipDataBeforeCreateUsing, [
@@ -373,7 +365,7 @@ class BlockEditor extends Builder
             $state = [];
             try {
                 $state = $container->getState(false);
-            } catch (\Illuminate\Validation\ValidationException $e) {
+            } catch (ValidationException $e) {
             }
 
             return view(
