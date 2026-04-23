@@ -3,6 +3,14 @@
 All notable changes to `filament-page-builder` will be documented in this file.
 
 
+## 4.0.0 Filament 4 compatible
+- Upgrade to Filament v4 (`Filament\Schemas\*`, `HasSchemas`, `getActiveSchemaLocale()`)
+- Replace `filament/spatie-laravel-translatable-plugin` with `lara-zeus/spatie-translatable`
+- `BlockEditor` now uses the v4 Builder state pattern via `getItems()` + `Schema`
+- `BlockEditorBlock::getChildComponents()` moved to `getDefaultChildComponents()`
+- Preview mode uses `live(debounce: 500)` instead of deprecated `reactive()`/`debounce()`
+- Requires PHP ^8.2, Laravel ^11.28 / ^12.0
+
 ## 3.0.9 Laravel 12 compatible
 
 ## 3.0.8 Laravel 11 compatible

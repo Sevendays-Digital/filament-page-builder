@@ -26,13 +26,13 @@ abstract class BlockEditorBlock extends Block
 
     abstract public function renderDisplay(array $state): string|View;
 
-    public function getChildComponents(): array
+    public function getDefaultChildComponents(): array
     {
         $formFields = $this->form();
         if (config('filament-page-builder.enablePreview')) {
             /** @var Field $field */
             foreach ($formFields as $field) {
-                $field->debounce()->reactive();
+                $field->live(debounce: 500);
             }
         }
 

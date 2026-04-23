@@ -14,9 +14,7 @@ class BlockRenderer
 {
     private ?array $cache = null;
 
-    public function __construct(protected Filesystem $filesystem)
-    {
-    }
+    public function __construct(protected Filesystem $filesystem) {}
 
     /**
      * @return class-string<BlockEditorBlock>[]
@@ -33,7 +31,8 @@ class BlockRenderer
             return [];
         }
 
-        $namespace = Str::of(Filament::getCurrentPanel()->getResourceNamespaces()[0])->beforeLast('\\')->append('\\Blocks*');
+        $panel = Filament::getCurrentPanel() ?? Filament::getDefaultPanel();
+        $namespace = Str::of($panel->getResourceNamespaces()[0])->beforeLast('\\')->append('\\Blocks*');
 
         $classes = collect($this->filesystem->allFiles($blocksDirectory))
             ->map(function (SplFileInfo $file) use ($namespace) {
@@ -45,8 +44,8 @@ class BlockRenderer
                         ->replace(['/'], ['\\']),
                 ) : null;
 
-                if (is_string($variableNamespace)) {
-                    $variableNamespace = (string) Str::of($variableNamespace)->before('\\');
+                if ($variableNamespace !== null) {
+                    $variableNamespace = (string) Str::of((string) $variableNamespace)->before('\\');
                 }
 
                 return (string) $namespace
@@ -68,7 +67,7 @@ class BlockRenderer
         /* @var class-string<BlockEditorBlock> $class */
         if ($class = ($this->getAllBlocks()[$block->type] ?? false)) {
             $pageContent = $block->content;
-            //todo dirty hack to 'detect' if translations are in use ...
+            // todo dirty hack to 'detect' if translations are in use ...
             if ($block->content === '') {
                 $pageContent = $block->translations['content'];
             }
